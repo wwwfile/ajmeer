@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Portal - Ajmeer Enterprises Ltd</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background-color: #1a252f;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: #fff;
+        }
+
+        .login-box, .welcome-box {
+            background: #fff;
+            color: #333;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            width: 100%;
+            max-width: 420px;
+            text-align: center;
+        }
+
+        .login-box h2, .welcome-box h2 {
+            color: #1a252f;
+            margin-bottom: 10px;
+            font-size: 26px;
+        }
+
+        .login-box p, .welcome-box p {
+            color: #777;
+            font-size: 14px;
+            margin-bottom: 25px;
+        }
+
+        .login-box input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+            outline: none;
+        }
+
+        .login-box input:focus {
+            border-color: #f39c12;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 12px;
+            background-color: #f39c12;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn:hover {
+            background-color: #d35400;
+        }
+
+        .back-link {
+            display: block;
+            margin-top: 15px;
+            color: #777;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .back-link:hover {
+            color: #1a252f;
+        }
+
+        /* Hidden class for switching views */
+        .hidden {
+            display: none;
+        }
+
+        .welcome-box h2 {
+            color: #f39c12;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- لاگ ان فارم باکس -->
+    <div id="loginSection" class="login-box">
+        <h2>Admin Portal</h2>
+        <p>Please enter your password to continue</p>
+        <form onsubmit="checkPassword(event)">
+            <input type="password" id="adminPassword" placeholder="Enter Password" required>
+            <button type="submit" class="btn">Login</button>
+        </form>
+        <a href="index.html" class="back-link">Back to Home</a>
+    </div>
+
+    <!-- پاسورڈ صحیح ہونے کے بعد ظاہر ہونے والا ویلکم میسج باکس -->
+    <div id="welcomeSection" class="welcome-box hidden">
+        <h2>Welcome, Admin!</h2>
+        <p>You have successfully logged in to Ajmeer Enterprises Ltd Management Panel.</p>
+        <a href="index.html" class="btn">Logout / Return to Home</a>
+    </div>
+
+    <script>
+        function checkPassword(event) {
+            event.preventDefault();
+            const correctPassword = "12345"; // یہاں آپ اپنا پاسورڈ تبدیل کر سکتے ہیں
+            const enteredPassword = document.getElementById("adminPassword").value;
+
+            if (enteredPassword === correctPassword) {
+                // لاگ ان فارم چھپا دیں اور ویلکم میسج دکھا دیں
+                document.getElementById("loginSection").classList.add("hidden");
+                document.getElementById("welcomeSection").classList.remove("hidden");
+            } else {
+                alert("Wrong Password! Please try again.");
+                // اوکے پر کلک کرنے پر ان پٹ فیلڈ صاف ہو جائے گی اور ہوم پیج پر ری ڈائریکٹ ہو جائے گا
+                document.getElementById("adminPassword").value = "";
+                window.location.href = "index.html";
+            }
+        }
+    </script>
+
+</body>
+</html>
