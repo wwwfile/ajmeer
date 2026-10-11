@@ -8,6 +8,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- PWA Manifest Link -->
+    <link rel="manifest" href="manifest.json">
     
     <style>
         * {
@@ -268,7 +270,6 @@
         <div class="logo">Ajmeer Enterprises Ltd</div>
         <div class="auth-buttons">
             <a href="admin.html" class="login-btn">Admin Login</a>
-            <!-- یہاں لنک بدل کر user.html کر دیا گیا ہے -->
             <a href="user.html" class="login-btn">User Login</a>
         </div>
     </header>
@@ -320,31 +321,4 @@
 
     <!-- Contact Section -->
     <section id="contact" class="contact">
-        <div class="section-title">
-            <h2>Contact Us</h2>
-            <p>Reach out to us for project inquiries, consultations, or quotes</p>
-        </div>
-        <form class="contact-form" onsubmit="handleSubmit(event)">
-            <input type="text" placeholder="Your Name" required>
-            <input type="tel" placeholder="Phone Number" required>
-            <input type="email" placeholder="Email Address">
-            <textarea placeholder="Write your message here..." required></textarea>
-            <button type="submit" class="btn">Send Message</button>
-        </form>
-    </section>
-
-    <!-- Footer -->
-    <footer>
-        <p>&copy; 2026 Ajmeer Enterprises Ltd. All Rights Reserved.</p>
-    </footer>
-
-    <script>
-        function handleSubmit(event) {
-            event.preventDefault();
-            alert('Your message has been sent successfully! We will contact you soon.');
-            event.target.reset();
-        }
-    </script>
-
-</body>
-</html>
+        <div class="section
