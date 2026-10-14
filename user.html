@@ -7,6 +7,186 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
+    <!-- Firebase SDKs -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getDatabase, ref, get, set, push, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyALvxl5Gqc3Vg99nCe-dvzDQ8PCoucN...",
+            authDomain: "ajmeer-enterprises-ltd.firebaseapp.com",
+            databaseURL: "https://ajmeer-enterprises-ltd-default-rtdb.firebaseio.com",
+            projectId: "ajmeer-enterprises-ltd",
+            storageBucket: "ajmeer-enterprises-ltd.appspot.com",
+            messagingSenderId: "1007609571015",
+            appId: "1:1007609571015:web:3d7649a00aa4c29b6...",
+            measurementId: "G-6VGFE47J0J"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        let currentProjectData = [];
+        let currentProjectKey = "";
+        let firebaseKeys = [];
+
+        window.showProjectTable = function() {
+            const dropdown = document.getElementById("projectDropdown");
+            currentProjectKey = dropdown.value;
+            const tableSection = document.getElementById("tableSection");
+            const tableTitle = document.getElementById("tableTitle");
+
+            if (!currentProjectKey) return;
+
+            tableTitle.innerText = dropdown.options[dropdown.selectedIndex].text + " - Material Log";
+
+            const projectRef = ref(db, 'projects/' + currentProjectKey);
+            get(projectRef).then((snapshot) => {
+                currentProjectData = [];
+                firebaseKeys = [];
+                if (snapshot.exists()) {
+                    snapshot.forEach((childSnapshot) => {
+                        firebaseKeys.push(childSnapshot.key);
+                        currentProjectData.push(childSnapshot.val());
+                    });
+                }
+                renderTable();
+                tableSection.classList.remove("hidden");
+            }).catch((error) => {
+                console.error("Error loading data: " + error.message);
+            });
+        }
+
+        window.renderTable = function() {
+            const tableBody = document.getElementById("tableBody");
+            let rowsHTML = "";
+
+            currentProjectData.forEach((item, index) => {
+                rowsHTML += `
+                    <tr>
+                        <td>${index + 1}</td>
+                        <td>${item.date}</td>
+                        <td>${item.cement}</td>
+                        <td>${item.bajri}</td>
+                        <td>${item.iron}</td>
+                        <td>${item.water}</td>
+                        <td>${item.labour}</td>
+                        <td>
+                            <div class="action-container">
+                                <button class="edit-btn" onclick="editRow(${index})">Edit</button>
+                                <button class="del-btn" onclick="deleteRow(${index})">Del</button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            const nextSNo = currentProjectData.length + 1;
+            const today = "14-10-2026";
+
+            rowsHTML += `
+                <tr style="background-color: #f1f8f5;">
+                    <td><b>${nextSNo}</b></td>
+                    <td><input type="text" id="inputDate" class="table-input" value="${today}"></td>
+                    <td><input type="text" id="inputCement" class="table-input" placeholder="Cement"></td>
+                    <td><input type="text" id="inputBajri" class="table-input" placeholder="Bajri"></td>
+                    <td><input type="text" id="inputIron" class="table-input" placeholder="Iron"></td>
+                    <td><input type="text" id="inputWater" class="table-input" placeholder="Water"></td>
+                    <td><input type="text" id="inputLabour" class="table-input" placeholder="Labour"></td>
+                    <td>
+                        <button class="add-btn" onclick="addNewRow()">Add</button>
+                    </td>
+                </tr>
+            `;
+
+            tableBody.innerHTML = rowsHTML;
+        }
+
+        window.addNewRow = function() {
+            const date = document.getElementById("inputDate").value.trim();
+            const cement = document.getElementById("inputCement").value.trim();
+            const bajri = document.getElementById("inputBajri").value.trim();
+            const iron = document.getElementById("inputIron").value.trim();
+            const water = document.getElementById("inputWater").value.trim();
+            const labour = document.getElementById("inputLabour").value.trim();
+
+            if (!cement || !bajri) {
+                alert("Please fill at least Cement and Bajri fields!");
+                return;
+            }
+
+            const newData = {
+                date: date || "14-10-2026",
+                cement: cement,
+                bajri: bajri,
+                iron: iron || "0",
+                water: water || "0",
+                labour: labour || "0"
+            };
+
+            const projectRef = ref(db, 'projects/' + currentProjectKey);
+            const newRowRef = push(projectRef);
+
+            set(newRowRef, newData).then(() => {
+                showProjectTable(); 
+            }).catch((error) => {
+                console.error("Error saving data: " + error.message);
+            });
+        }
+
+        window.deleteRow = function(index) {
+            const rowKey = firebaseKeys[index];
+            const rowRef = ref(db, 'projects/' + currentProjectKey + '/' + rowKey);
+
+            remove(rowRef).then(() => {
+                showProjectTable();
+            }).catch((error) => {
+                console.error("Error deleting record: " + error.message);
+            });
+        }
+
+        // تمام کالمز کو ایڈٹ کرنے کا فنکشن
+        window.editRow = function(index) {
+            const item = currentProjectData[index];
+
+            const newDate = prompt("Edit Date (dd-MM-yyyy):", item.date);
+            if (newDate === null) return;
+
+            const newCement = prompt("Edit Cement:", item.cement);
+            if (newCement === null) return;
+
+            const newBajri = prompt("Edit Bajri:", item.bajri);
+            if (newBajri === null) return;
+
+            const newIron = prompt("Edit Iron:", item.iron);
+            if (newIron === null) return;
+
+            const newWater = prompt("Edit Water:", item.water);
+            if (newWater === null) return;
+
+            const newLabour = prompt("Edit Labour:", item.labour);
+            if (newLabour === null) return;
+
+            const rowKey = firebaseKeys[index];
+            const rowRef = ref(db, 'projects/' + currentProjectKey + '/' + rowKey);
+
+            const updatedData = {
+                date: newDate,
+                cement: newCement,
+                bajri: newBajri,
+                iron: newIron,
+                water: newWater,
+                labour: newLabour
+            };
+
+            set(rowRef, updatedData).then(() => {
+                showProjectTable();
+            }).catch((error) => {
+                console.error("Error updating record: " + error.message);
+            });
+        }
+    </script>
+
     <style>
         * {
             margin: 0;
@@ -150,7 +330,7 @@
 
         table {
             width: 100%;
-            min-width: 500px;
+            min-width: 700px;
             border-collapse: collapse;
             text-align: center;
         }
@@ -169,6 +349,73 @@
 
         tr:nth-child(even) {
             background-color: #f9f9f9;
+        }
+
+        .table-input {
+            width: 100%;
+            padding: 6px 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 12px;
+            outline: none;
+            text-align: center;
+        }
+
+        .table-input:focus {
+            border-color: #27ae60;
+        }
+
+        .add-btn {
+            background-color: #27ae60;
+            color: #fff;
+            border: none;
+            padding: 6px 15px;
+            border-radius: 4px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+            white-space: nowrap;
+        }
+
+        .add-btn:hover {
+            background-color: #219653;
+        }
+
+        .action-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .edit-btn, .del-btn {
+            padding: 5px 10px;
+            border: none;
+            border-radius: 4px;
+            font-size: 12px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background 0.3s;
+            white-space: nowrap;
+        }
+
+        .edit-btn {
+            background-color: #f39c12;
+            color: #fff;
+        }
+
+        .edit-btn:hover {
+            background-color: #d35400;
+        }
+
+        .del-btn {
+            background-color: #e74c3c;
+            color: #fff;
+        }
+
+        .del-btn:hover {
+            background-color: #c0392b;
         }
 
         .hidden {
@@ -203,8 +450,8 @@
                     <h3>My Projects</h3>
                     <select id="projectDropdown" class="project-select" onchange="showProjectTable()">
                         <option value="" disabled selected>Select Your Project</option>
-                        <option value="ajmeer">Ajmeer Heights</option>
-                        <option value="yousaf">Yousaf Heights</option>
+                        <option value="ajmeer_heights">Ajmeer Heights</option>
+                        <option value="yousaf_heights">Yousaf Heights</option>
                     </select>
                 </div>
 
@@ -214,12 +461,14 @@
                         <table>
                             <thead>
                                 <tr>
+                                    <th>S.No</th>
                                     <th>Date</th>
                                     <th>Cement</th>
                                     <th>Bajri</th>
                                     <th>Iron</th>
                                     <th>Water</th>
                                     <th>Labour</th>
+                                    <th>Action</th>
                                 </tr>
                             </thead>
                             <tbody id="tableBody">
@@ -243,53 +492,6 @@
             </div>
         </div>
     </div>
-
-    <script>
-        function showProjectTable() {
-            const dropdown = document.getElementById("projectDropdown");
-            const selectedValue = dropdown.value;
-            const tableSection = document.getElementById("tableSection");
-            const tableTitle = document.getElementById("tableTitle");
-            const tableBody = document.getElementById("tableBody");
-
-            let projectData = [];
-            let projectName = "";
-
-            if (selectedValue === "ajmeer") {
-                projectName = "Ajmeer Heights - Material Log";
-                projectData = [
-                    { date: "01-10-2026", cement: "150", bajri: "1200", iron: "5.5", water: "3", labour: "25" },
-                    { date: "05-10-2026", cement: "200", bajri: "1500", iron: "8.0", water: "4", labour: "30" },
-                    { date: "10-10-2026", cement: "100", bajri: "900", iron: "3.2", water: "2", labour: "20" }
-                ];
-            } else if (selectedValue === "yousaf") {
-                projectName = "Yousaf Heights - Material Log";
-                projectData = [
-                    { date: "02-10-2026", cement: "180", bajri: "1350", iron: "6.0", water: "3", labour: "28" },
-                    { date: "08-10-2026", cement: "220", bajri: "1600", iron: "9.1", water: "5", labour: "35" }
-                ];
-            }
-
-            tableTitle.innerText = projectName;
-
-            let rowsHTML = "";
-            projectData.forEach(item => {
-                rowsHTML += `
-                    <tr>
-                        <td>${item.date}</td>
-                        <td>${item.cement}</td>
-                        <td>${item.bajri}</td>
-                        <td>${item.iron}</td>
-                        <td>${item.water}</td>
-                        <td>${item.labour}</td>
-                    </tr>
-                `;
-            });
-
-            tableBody.innerHTML = rowsHTML;
-            tableSection.classList.remove("hidden");
-        }
-    </script>
 
 </body>
 </html>
